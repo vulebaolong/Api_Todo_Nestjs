@@ -1,4 +1,5 @@
-import { IsEmail, IsNotEmpty, IsString, MinLength } from "class-validator";
+import { IsEmail, IsNotEmpty, IsOptional, IsString, MinLength } from "class-validator";
+import { Type } from "../schema/user.schema";
 
 export class RegisterDto {
     @IsNotEmpty()
@@ -9,6 +10,9 @@ export class RegisterDto {
     @IsString()
     @IsEmail({}, { message: "Please enter correct email" })
     email: string;
+
+    @IsOptional()
+    type: Type;
 
     @IsNotEmpty()
     @IsString()

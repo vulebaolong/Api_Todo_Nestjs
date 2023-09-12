@@ -7,7 +7,10 @@ import * as bcrypt from "bcryptjs";
 import { JwtService } from "@nestjs/jwt";
 import { LoginDto } from "./dto/login.dto";
 
-export interface I_authRes extends User {
+export interface I_authRes {
+    type: string;
+    name: string;
+    email: string;
     token: string;
 }
 
@@ -20,9 +23,9 @@ export class AuthService {
     ) {}
 
     async register(registerDto: RegisterDto): Promise<I_authRes> {
-        const { name, email, password } = registerDto;
+        const { name, email, password, type } = registerDto;
 
-        const userExit = await this.userModel.findOne({email: email})
+        const userExit = await this.userModel.findOne({ email: email });
 
         if (userExit) {
             throw new ConflictException("Email already exists");
@@ -31,6 +34,7 @@ export class AuthService {
         const hashedPassword = await bcrypt.hash(password, 10);
 
         const user = await this.userModel.create({
+            type,
             name,
             email,
             password: hashedPassword,
@@ -57,10 +61,10 @@ export class AuthService {
             throw new UnauthorizedException("Invalid email or password");
         }
 
-        const isPasswordMatched = await bcrypt.compare(password, user.password)
+        const isPasswordMatched = await bcrypt.compare(password, user.password);
 
         if (!isPasswordMatched) {
-            throw new UnauthorizedException('Invalid email or password')
+            throw new UnauthorizedException("Invalid email or password");
         }
 
         const token = this.jwtService.sign({ id: user._id });
